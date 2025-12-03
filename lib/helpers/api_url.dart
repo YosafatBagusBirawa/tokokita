@@ -1,5 +1,5 @@
 class ApiUrl {
-  static const String baseUrl = 'http://10.0.2.2/tokokita/public';
+  static const String baseUrl = 'http://192.168.56.1/tokokita/public';
 
   static const String registrasi = baseUrl + '/registrasi';
   static const String login = baseUrl + '/login';
