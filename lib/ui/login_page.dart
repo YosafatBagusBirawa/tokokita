@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:tokokita/bloc/login_bloc.dart';
+import 'package:tokokita/helpers/user_info.dart';
+import 'package:tokokita/ui/produk_page.dart';
 import 'package:tokokita/ui/registrasi_page.dart';
+import 'package:tokokita/widget/warning_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -19,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login Yosa"),
+        title: const Text('Login'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -31,8 +35,10 @@ class _LoginPageState extends State<LoginPage> {
                 _emailTextField(),
                 _passwordTextField(),
                 _buttonLogin(),
-                const SizedBox(height: 30),
-                _menuRegistrasi(),
+                const SizedBox(
+                  height: 30,
+                ),
+                _menuRegistrasi()
               ],
             ),
           ),
@@ -87,7 +93,32 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       _isLoading = true;
     });
-    // Proses login ke API
+    LoginBloc.login(
+            email: _emailTextboxController.text,
+            password: _passwordTextboxController.text)
+        .then((value) async {
+      if (value.code == 200) {
+        await UserInfo().setToken(value.token.toString());
+        await UserInfo().setUserID(int.parse(value.userID.toString()));
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const ProdukPage()));
+      } else {
+        showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) => const WarningDialog(
+                  description: "Login gagal, silahkan coba lagi",
+                ));
+      }
+    }, onError: (error) {
+      print(error);
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) => const WarningDialog(
+                description: "Login gagal, silahkan coba lagi",
+              ));
+    });
     setState(() {
       _isLoading = false;
     });
